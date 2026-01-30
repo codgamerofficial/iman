@@ -2,13 +2,16 @@
 
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
+import ThreeScene from "./ThreeScene";
 
 
 export default function Hero() {
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-stone-950">
 
-            {/* 3D Scene Removed */}
+            <div className="absolute inset-0 z-0">
+                <ThreeScene />
+            </div>
 
 
             <div className="container relative z-10 px-6 pointer-events-none">
