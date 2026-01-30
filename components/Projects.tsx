@@ -31,7 +31,7 @@ export default function Projects() {
 
                                 <div className="md:w-1/3">
                                     <div className="flex items-center gap-4 mb-2">
-                                        <span className="font-mono text-sm font-bold border border-black px-2 py-1 rounded-full">{project.year}</span>
+
                                         <span className="font-oswald uppercase tracking-widest text-sm">{project.category}</span>
                                     </div>
                                     <h3 className="text-4xl md:text-6xl font-anton uppercase group-hover:text-white transition-colors text-shadow-sm">

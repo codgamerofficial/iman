@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Anton, Oswald, Inter } from "next/font/google";
 import "./globals.css";
 
+
 const anton = Anton({
   weight: "400",
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
         className={`${anton.variable} ${oswald.variable} ${inter.variable} antialiased bg-stone-950 text-white`}
       >
         {children}
+
       </body>
     </html>
   );

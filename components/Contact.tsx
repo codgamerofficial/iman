@@ -1,7 +1,113 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Mail, MapPin, Phone, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail, MapPin, Phone, ArrowRight, Loader2, CheckCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+
+function ContactForm() {
+    const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setStatus("submitting");
+
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+
+        const messageData = {
+            name: formData.get("name"),
+            email: formData.get("email"),
+            message: formData.get("message"),
+        };
+
+        try {
+            const { error } = await supabase
+                .from('messages')
+                .insert([messageData]);
+
+            if (error) throw error;
+
+            setStatus("success");
+            form.reset();
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            setStatus("error");
+        }
+    };
+
+    if (status === "success") {
+        return (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="h-full flex flex-col items-center justify-center text-center space-y-4"
+            >
+                <CheckCircle size={64} className="text-black" />
+                <h3 className="text-black font-anton text-4xl uppercase">Message Sent!</h3>
+                <p className="font-oswald text-black/70 text-lg uppercase tracking-wide">
+                    I'll get back to you shortly.
+                </p>
+                <button
+                    onClick={() => setStatus("idle")}
+                    className="mt-4 px-6 py-2 border-2 border-black text-black font-bold uppercase hover:bg-black hover:text-[#CCFF00] transition-colors"
+                >
+                    Send Another
+                </button>
+            </motion.div>
+        );
+    }
+
+    return (
+        <form onSubmit={handleSubmit} className="flex flex-col justify-between h-full">
+            <div>
+                <h3 className="text-black font-anton text-4xl uppercase mb-4">Quick Form</h3>
+
+                <input
+                    name="name"
+                    type="text"
+                    required
+                    placeholder="NAME"
+                    className="w-full bg-black/10 border-b-2 border-black placeholder-black/50 p-4 mb-4 font-oswald text-black focus:outline-none focus:bg-black/20 transition-colors"
+                />
+
+                <input
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="EMAIL"
+                    className="w-full bg-black/10 border-b-2 border-black placeholder-black/50 p-4 mb-4 font-oswald text-black focus:outline-none focus:bg-black/20 transition-colors"
+                />
+
+                <textarea
+                    name="message"
+                    required
+                    placeholder="MESSAGE"
+                    rows={3}
+                    className="w-full bg-black/10 border-b-2 border-black placeholder-black/50 p-4 mb-4 font-oswald text-black focus:outline-none focus:bg-black/20 transition-colors resize-none"
+                ></textarea>
+
+                {status === "error" && (
+                    <p className="text-red-600 font-bold uppercase text-sm mb-2">
+                        Something went wrong. Please try again.
+                    </p>
+                )}
+            </div>
+
+            <button
+                type="submit"
+                disabled={status === "submitting"}
+                className="w-full bg-black text-white font-anton uppercase text-xl py-4 hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+                {status === "submitting" ? (
+                    <>Sending <Loader2 className="animate-spin" /></>
+                ) : (
+                    <>Send Message <ArrowRight /></>
+                )}
+            </button>
+        </form>
+    );
+}
 
 export default function Contact() {
     return (
@@ -49,16 +155,7 @@ export default function Contact() {
                     </div>
 
                     <div className="bg-[#CCFF00] p-10 flex flex-col justify-between min-h-[400px]">
-                        <div>
-                            <h3 className="text-black font-anton text-4xl uppercase mb-4">Quick Form</h3>
-                            <input type="text" placeholder="NAME" className="w-full bg-black/10 border-b-2 border-black placeholder-black/50 p-4 mb-4 font-oswald text-black focus:outline-none focus:bg-black/20" />
-                            <input type="email" placeholder="EMAIL" className="w-full bg-black/10 border-b-2 border-black placeholder-black/50 p-4 mb-4 font-oswald text-black focus:outline-none focus:bg-black/20" />
-                            <textarea placeholder="MESSAGE" rows={3} className="w-full bg-black/10 border-b-2 border-black placeholder-black/50 p-4 mb-4 font-oswald text-black focus:outline-none focus:bg-black/20"></textarea>
-                        </div>
-
-                        <button className="bg-black text-white font-anton uppercase text-xl py-4 hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2">
-                            Send Message <ArrowRight />
-                        </button>
+                        <ContactForm />
                     </div>
 
                 </div>
