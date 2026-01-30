@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, MapPin, Phone, ArrowRight, Loader2, CheckCircle } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 function ContactForm() {
     const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -13,25 +12,24 @@ function ContactForm() {
         setStatus("submitting");
 
         const form = e.currentTarget;
-        const formData = new FormData(form);
-
-        const messageData = {
-            name: formData.get("name"),
-            email: formData.get("email"),
-            message: formData.get("message"),
-        };
+        const data = new FormData(form);
 
         try {
-            const { error } = await supabase
-                .from('messages')
-                .insert([messageData]);
+            const response = await fetch("https://formspree.io/f/meekpzlv", {
+                method: "POST",
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
 
-            if (error) throw error;
-
-            setStatus("success");
-            form.reset();
+            if (response.ok) {
+                setStatus("success");
+                form.reset();
+            } else {
+                setStatus("error");
+            }
         } catch (error) {
-            console.error("Error submitting form:", error);
             setStatus("error");
         }
     };
